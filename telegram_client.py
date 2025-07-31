@@ -2,6 +2,7 @@ import requests as req  # type: ignore
 
 
 class TelegramClient:
+
     def __init__(self, api_token: str, base_url: str):
         self.api_token = api_token
         self.base_url = base_url

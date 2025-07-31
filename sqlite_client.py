@@ -2,7 +2,6 @@ import sqlite3
 
 
 class SQLiteClient:
-    """SQLite3 handler."""
 
     def __init__(self, filepath: str):
         self.filepath = filepath

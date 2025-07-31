@@ -1,4 +1,5 @@
 import logging
+import re
 import datetime as dt
 import time
 from enum import Enum
@@ -207,26 +208,30 @@ def show_user_car(message):
                      user_states.get(message.from_user.id) == (
                          UserState.WAITING_FOR_REPAIR_INFO))
 def handle_one_car_desc(message):
-    try:
-        mileage, description = message.text.strip().split('-')
+    pattern = r'^(\d+)\s*[-\s]+\s*(.*)$'
+
+    user_text = message.text.strip('- ')
+    match_text = re.match(pattern, user_text, re.DOTALL)
+    if match_text:
+        mileage, description = match_text.groups()
         user_id = temp_storage['user_id']
         car_name = temp_storage['car']
-    except ValueError:
-        bot.reply_to(message, '⚠️Некорректный формат сообщения!⚠️\n'
-                              'Введи сообщение '
-                              'следующего формата:\n"<b>Текущий пробег-Информ'
-                              'ация касательно ремонта</b>"',
-                              parse_mode='Html')
-    else:
         user_states.pop(user_id)
-        temp_storage.pop('car')
-        temp_storage.pop('user_id')
+
         add_repair_description(user_id,
                                car_name,
                                dt.date.today(),
                                description,
                                mileage)
         bot.reply_to(message, '✅Запись успешно сохранена.')
+        temp_storage.pop('car')
+        temp_storage.pop('user_id')
+    else:
+        bot.reply_to(message, '⚠️Некорректный формат сообщения!⚠️\n'
+                              'Введи сообщение '
+                              'следующего формата:\n"<b>Текущий пробег-Информ'
+                              'ация касательно ремонта</b>"',
+                              parse_mode='Html')
 
 
 @bot.message_handler(commands=['add_service_notation'])
@@ -335,10 +340,11 @@ def get_car_history(car_name: str, telegram_id: int):
         res = []
         for row in data:
             mileage, date, info = row
-            text = (f'Пробег: {mileage} км. || Дата: {date} '
-                    f'|| Выполненные действия: {info}.')
+            text = (f'1️⃣Запись от 📅 {date}.\n'
+                    f'2️⃣Пробег: 🚚 <b>{mileage}</b> км.\n'
+                    f'3️⃣Выполненные действия🔧:\n<i>{info}</i>.')
             res.append(text)
-        bot.send_message(telegram_id, '\n\n'.join(res))
+        bot.send_message(telegram_id, '\n\n\n'.join(res), parse_mode='Html')
     else:
         bot.send_message(telegram_id, 'История пуста.')
 
