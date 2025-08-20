@@ -1,13 +1,12 @@
-import logging
-import re
 import datetime as dt
+import re
+import logging
 import time
 from enum import Enum
 
 import telebot as tb  # type: ignore
 from telebot.types import (InlineKeyboardMarkup,  # type: ignore
                            InlineKeyboardButton)
-
 from envparse import env  # type: ignore
 
 from sqlite_client import SQLiteClient
@@ -22,7 +21,7 @@ FORMATTER = logging.Formatter(
 console_handler.setFormatter(FORMATTER)
 logger.addHandler(console_handler)
 
-env.read_envfile('.env')
+# env.read_envfile('.env')
 TOKEN = env('TOKEN')
 ADMIN_CHAT_ID = env('ADMIN_CHAT_ID')
 BASE_URL = 'https://api.telegram.org'
